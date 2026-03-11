@@ -1,44 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acchi Muite Hoi!</title>
+    <title>Janken Game Acchi Muite Hoi!</title>
     <style>
-        body { background: #000; color: #fff; margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
-        #start-screen {
-            position: absolute; width: 100%; height: 100%;
-            background: #111; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 99; cursor: pointer;
+        /* Ensure the game fills the entire embed window */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: sans-serif;
         }
-        .play-button {
-            padding: 20px 40px; font-size: 24px; background: #e60012;
-            color: white; border: none; border-radius: 50px; font-weight: bold;
+
+        /* The Start Screen Overlay */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
             cursor: pointer;
+        }
+
+        .play-button {
+            padding: 20px 50px;
+            font-size: 28px;
+            background: #e60012; /* Arcade Red */
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(230, 0, 18, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+        }
+
+        p {
+            color: #888;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        /* The Game Container */
+        #game {
+            width: 100vw;
+            height: 100vh;
         }
     </style>
 </head>
 <body>
 
+    <!-- This screen handles the Audio and Keyboard Focus -->
     <div id="start-screen" onclick="startEmulator()">
         <button class="play-button">CLICK TO PLAY</button>
-        <p>Audio will enable on click</p>
+        <p>Audio and Controls will enable on click</p>
     </div>
 
+    <!-- The Emulator will load here -->
     <div id="game"></div>
 
     <script>
         function startEmulator() {
+            // Hide the start screen
             document.getElementById('start-screen').style.display = 'none';
             
+            // EmulatorJS Configuration
             window.EJS_player = '#game';
-            window.EJS_core = 'mame'; 
-            window.EJS_gameUrl = 'acchi.zip'; // This file must be in your GitHub repo
             
-            // Pointing to the official CDN instead of a local folder
+            // 'mame' is the modern core required for this game
+            window.EJS_core = 'mame'; 
+            
+            // FULL URL to your ROM file on GitHub Pages
+            window.EJS_gameUrl = 'https://andrewpoke1232.github.io/school-unblocked-japanese-arcade-rockpaperscissors/acchi.zip'; 
+            
+            // Official CDN for emulator data files
             window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
+            
             window.EJS_startOnLoaded = true;
 
+            // Load the EmulatorJS engine
             var script = document.createElement('script');
             script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
             document.body.appendChild(script);
