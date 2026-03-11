@@ -3,98 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Janken Game Acchi Muite Hoi!</title>
+    <title>Debug Mode - Acchi Muite Hoi!</title>
     <style>
-        /* Ensure the game fills the entire embed window */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-
-        /* The Start Screen Overlay */
+        body { background: #000; color: #0f0; margin: 0; padding: 20px; font-family: monospace; overflow: hidden; }
         #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #111;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            cursor: pointer;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #111; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 999; cursor: pointer;
         }
-
         .play-button {
-            padding: 20px 50px;
-            font-size: 28px;
-            background: #e60012; /* Arcade Red */
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(230, 0, 18, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s;
+            padding: 20px 50px; font-size: 28px; background: #e60012;
+            color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
         }
-
-        .play-button:hover {
-            transform: scale(1.05);
+        #debug-log {
+            position: absolute; bottom: 10px; left: 10px; width: 90%;
+            max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.8);
+            border: 1px solid #0f0; padding: 10px; font-size: 12px; z-index: 1000;
+            pointer-events: none;
         }
-
-        p {
-            color: #888;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        /* The Game Container */
-        #game {
-            width: 100vw;
-            height: 100vh;
-        }
+        #game { width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
 
-    <!-- This screen handles the Audio and Keyboard Focus -->
     <div id="start-screen" onclick="startEmulator()">
-        <button class="play-button">CLICK TO PLAY</button>
-        <p>Audio and Controls will enable on click</p>
+        <button class="play-button">START DEBUG LOAD</button>
+        <p style="color: #888;">Check the green text at the bottom for errors</p>
     </div>
 
-    <!-- The Emulator will load here -->
+    <div id="debug-log">DEBUG LOG INITIALIZED...<br></div>
     <div id="game"></div>
 
     <script>
-        function startEmulator() {
-            // Hide the start screen
+        const logElement = document.getElementById('debug-log');
+        
+        function log(msg) {
+            console.log(msg);
+            logElement.innerHTML += "> " + msg + "<br>";
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        async function checkFile(url) {
+            log("Checking ROM at: " + url);
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                if (response.ok) {
+                    log("SUCCESS: ROM file found (Status 200)");
+                    return true;
+                } else {
+                    log("ERROR: ROM file not found (Status " + response.status + ")");
+                    return false;
+                }
+            } catch (e) {
+                log("ERROR: Network/CORS error checking ROM.");
+                return false;
+            }
+        }
+
+        async function startEmulator() {
+            log("Starting Emulator sequence...");
             document.getElementById('start-screen').style.display = 'none';
             
-            // EmulatorJS Configuration
+            const romUrl = 'https://andrewpoke1232.github.io/school-unblocked-japanese-arcade-rockpaperscissors/acchi.zip';
+            
+            const exists = await checkFile(romUrl);
+            
+            if (!exists) {
+                log("ABORTING: Emulator will not load without ROM.");
+                alert("ROM file not found on GitHub! Check your filename.");
+                return;
+            }
+
+            log("Configuring EmulatorJS...");
             window.EJS_player = '#game';
-            
-            // 'mame' is the modern core required for this game
             window.EJS_core = 'mame'; 
-            
-            // FULL URL to your ROM file on GitHub Pages
-            window.EJS_gameUrl = 'https://andrewpoke1232.github.io/school-unblocked-japanese-arcade-rockpaperscissors/acchi.zip'; 
-            
-            // Official CDN for emulator data files
+            window.EJS_gameUrl = romUrl; 
             window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
-            
             window.EJS_startOnLoaded = true;
 
-            // Load the EmulatorJS engine
+            log("Loading loader.js from CDN...");
             var script = document.createElement('script');
             script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+            
+            script.onload = function() {
+                log("loader.js loaded successfully.");
+            };
+            
+            script.onerror = function() {
+                log("ERROR: Failed to load loader.js from CDN.");
+            };
+
             document.body.appendChild(script);
         }
     </script>
