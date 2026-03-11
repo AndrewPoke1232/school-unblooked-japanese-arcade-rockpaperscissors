@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acchi Muite Hoi!</title>
+    <style>
+        body { background: #000; color: #fff; margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
+        #start-screen {
+            position: absolute; width: 100%; height: 100%;
+            background: #111; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 99; cursor: pointer;
+        }
+        .play-button {
+            padding: 20px 40px; font-size: 24px; background: #e60012;
+            color: white; border: none; border-radius: 50px; font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" onclick="startEmulator()">
+        <button class="play-button">CLICK TO PLAY</button>
+        <p>Audio will enable on click</p>
+    </div>
+
+    <div id="game"></div>
+
+    <script>
+        function startEmulator() {
+            document.getElementById('start-screen').style.display = 'none';
+            
+            window.EJS_player = '#game';
+            window.EJS_core = 'mame'; 
+            window.EJS_gameUrl = 'acchi.zip'; // This file must be in your GitHub repo
+            
+            // Pointing to the official CDN instead of a local folder
+            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'; 
+            window.EJS_startOnLoaded = true;
+
+            var script = document.createElement('script');
+            script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>
